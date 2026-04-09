@@ -22,21 +22,12 @@ def guardar_usuario():
 
     # SQL
     #============================================================================================
-    sql ="SELECT docuemple FROM usuarios WHERE docuemple = %s"
-
-    cursor.execute(sql,(documento,))
-    resultado = cursor.fetchone()
-
-    if resultado:
-         print("El documento ya esta registrado")
-    else:
-        sql = """INSERT INTO usuarios(usuario, password, rol, docuemple)VALUES(%s, %s, %s, %s)"""
-        datos = (usuario, password, rolusu, documento)
-        cursor.execute(sql, datos)
-        con.commit()
-        print("Usuario registrado Correctamente")
-      #============================================================================================
-    return redirect('/')
+    sql = """INSERT INTO usuarios(usuario, password, rol, docuemple)VALUES(%s, %s, %s, %s)"""
+    datos = (usuario, password, rolusu, documento)
+    cursor.execute(sql, datos)
+    con.commit()
+    #============================================================================================
+    return "usuario guardado"
 
 if __name__ == '__main__':
     app.run(debug=True)

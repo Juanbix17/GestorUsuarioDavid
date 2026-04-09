@@ -22,15 +22,80 @@
                 Registrar Usuario
             </button>
 
-            <button class="btn btn-primary">
-                Ver Usuarios
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#Modalemple">
+                Registar Empleados
             </button>
+            <a href="{{ url_for('salir') }}" class="btn btn-danger">
+                Cerrar Sesión
+            </a>
         </div>
 
     </div>
 </div>
 
 {% include 'registrarusu.html' %}
+{% include 'empleados.html' %}
+<!-- Tabla de usuarios -->
+    <table class="table table-striped mt-3">
+      <thead class="table-blue">
+         <tr>
+            <td>Codigo</td>
+            <td>Usuario</td>
+            <td>Contraseña</td>
+            <td>Rol</td>
+            <td>Opciones</td>
+         </tr>
+      </thead>
+        <tbody>
+          {% for u in user %}
+            <tr>
+                <td>{{ u[0] }}</td>
+                <td>{{ u[1] }}</td>
+                <td>{{ u[2] }}</td>
+                <td>{{ u[3] }}</td>
+                <td>
+                    <a class="btn btn-warning">Editar</a>
+                    <a href="{{ url_for('eliminarusu', id=u[0]) }}" class="btn btn-danger"onclick="return confirm('¿Seguro que desea eliminar ese usuario?')">Eliminar</a>
+                </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+ 
+<!-- Tabla de empleados -->
+    <table class="table table-striped mt-3">
+      <thead class="table-blue">
+         <tr>
+            <td>Codigo</td>
+            <td>Documento</td>
+            <td>Nombre</td>
+            <td>Apellido</td>
+            <td>Cargo</td>
+            <td>Salario Base</td>
+            <td>Horas Extra</td>
+            <td>Bonificación</td>
+            <td>Departamento</td>
+            <td>Opciones</td>
+         </tr>
+      </thead>
+        <tbody>
+          {% for e in empleados %}
+            <tr>
+                <td>{{ e[0] }}</td>
+                <td>{{ e[1] }}</td>
+                <td>{{ e[2] }}</td>
+                <td>{{ e[3] }}</td>
+                <td>{{ e[4] }}</td>
+                <td>{{ e[5] }}</td>
+                <td>{{ e[6] }}</td>
+                <td>{{ e[7] }}</td>
+                <td>{{ e[8] }}</td>
+                <td>
+                    <a class="btn btn-warning">Editar</a>
+                    <a href="{{ url_for('eliminaremp', id=e[0]) }}" class="btn btn-danger"onclick="return confirm('¿Seguro que desea eliminar ese empleado?')">Eliminar</a>
+            </tr>
+          {% endfor %}
+        </tbody>
+    </table>
 
 </body>
 </html>

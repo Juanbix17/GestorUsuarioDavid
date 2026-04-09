@@ -1,0 +1,70 @@
+<div class="modal fade" id="Modalemple">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h4 class="modal-title">Registrar Empleado</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <form method="POST" action="{{url_for('guardar_empleado')}}">
+
+                    <div class="mb-3">
+                        <label>Documento: </label>
+                        <input type="int" class="form-control" name="txtdocumento">
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Nombre: </label>
+                        <input type="text" class="form-control" name="txtnombre">
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Apellido: </label>
+                        <input type="text" class="form-control" name="txtapellido">
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Cargo: </label>
+                        <input type="text" class="form-control" name="txtcargo">
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Departamento</label>
+                        <select class="form-select" name="txtdepartamento">
+                            <option value="">Seleccione</option>
+                            <option value="1">Sistemas</option>
+                            <option value="2">Cafeteria</option>
+                            <option value="3">Contabilidad</option>
+                            <option value="4">Recursos Humanos</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Horas Extra: </label>
+                        <input type="int" class="form-control" name="txthorasextra">
+                    </div>
+
+                    <div class="mb-3">
+                        <label>Bonificación: </label>
+                        <input type="int" class="form-control" name="txtbonificacion">
+                    </div>
+
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">
+                            Registrar
+                        </button>
+
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+                            Cancelar
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
