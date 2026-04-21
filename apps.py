@@ -67,6 +67,74 @@ def inicio():
         departamentos = cursor.fetchall()
 
         return render_template('index.html',usuario=session['usuario'],user=lista, empleados=empleados, departamentos=departamentos)
+    
+#editar usuario
+@apps.route('/editarusu/<int:id>')
+def editarusu(id):
+    if 'usuario' not in session:
+        return redirect(url_for('login_form'))
+    con = conectar()
+    cursor = con.cursor()
+    sql = "SELECT * FROM usuarios WHERE id_usuario=%s"
+    cursor.execute(sql,(id,))
+    usuario = cursor.fetchone()
+    cursor.close()
+    con.close()
+    return render_template('editarusu.html', usu=usuario)
+#actualizar usuario
+@apps.route('/actualizar_usuario/<int:id>', methods=['POST'])
+def actualizar_usuario(id):
+    id = request.form['id']
+    usuario = request.form['txtusuario']
+    password = request.form['txtpassword']
+    
+    con = conectar()
+    cursor = con.cursor()
+    
+    sql = "UPDATE usuarios SET usuario=%s, password=%s WHERE id_usuario=%s"
+    cursor.execute(sql, (usuario, password, id))
+    con.commit()
+    
+    cursor.close()
+    con.close()
+    
+    print("Usuario actualizado correctamente")
+    return redirect(url_for('inicio'))
+#editar empleado
+@apps.route('/editaremp/<int:id>')
+def editaremp(id):
+    if 'usuario' not in session:
+        return redirect(url_for('login_form'))
+    con = conectar()
+    cursor = con.cursor()
+    sql = "SELECT * FROM empleados WHERE id=%s"
+    cursor.execute(sql,(id,))
+    empleado = cursor.fetchone()
+    cursor.close()
+    con.close()
+    return render_template('editaremple.html', emp=empleado)
+#actualizar empleado
+@apps.route('/actualizaremp/<int:id>', methods=['POST'])
+def actualizaremp(id):
+    nombre = request.form['txtnombre']
+    apellido = request.form['txtapellido']
+    cargo = request.form['txtcargo']
+    departamento = request.form['txtdepartamento']
+    horas_extra = request.form['txthorasextra']
+    bonificacion = request.form['txtbonificacion']
+
+    con = conectar()
+    cursor = con.cursor()
+    
+    sql = "UPDATE empleados SET NombreEmple=%s, ApellidoEmple=%s, Cargo=%s, id_area=%s, HoraExtra=%s, Bonificacion=%s WHERE id=%s"
+    cursor.execute(sql, (nombre, apellido, cargo, departamento, horas_extra, bonificacion, id))
+    con.commit()
+    
+    cursor.close()
+    con.close()
+    
+    print("Empleado actualizado correctamente")
+    return redirect(url_for('inicio'))
 #guardar usuario
 @apps.route('/guardar_usuario', methods=['POST'])
 def guardar_usuario():
@@ -153,27 +221,33 @@ def eliminarusu(id):
 def eliminaremp(id):
     if 'usuario' not in session:
         return redirect(url_for('login_form'))
+
     con = conectar()
     cursor = con.cursor()
 
-    #buscar usuario
-    sql = "SELECT Cargo FROM empleados WHERE id=%s"
-    cursor.execute(sql,(id,))
+    sql = "SELECT e.DocumentoEmple, u.rol FROM empleados e JOIN usuarios u ON e.DocumentoEmple = u.docuemple WHERE e.id = %s"
+    cursor.execute(sql, (id,))
     empleado = cursor.fetchone()
-    #validar el rol del usuario
+
     if empleado:
-        rol = empleado[0]
-        if rol == "administrador":
+        documento_emple = empleado[0]
+        cargo = empleado[1]
+
+        if cargo.lower() == "administrador":
             flash("No se puede eliminar un usuario con rol de administrador")
+            cursor.close()
+            con.close()
+            return redirect(url_for('inicio'))
+
+        cursor.execute("DELETE FROM usuarios WHERE docuemple = %s", (documento_emple,))
+        cursor.execute("DELETE FROM empleados WHERE DocumentoEmple = %s", (documento_emple,))
             
-        else:
-            cursor.execute("DELETE FROM empleados WHERE id=%s",(id,))
-            con.commit()
-            flash("Usuario eliminado correctamente")
-            
+        con.commit()
+        flash("Empleado y usuario eliminados correctamente")
+
     cursor.close()
     con.close()
-    return redirect(url_for('inicio')) 
+    return redirect(url_for('inicio'))
     
 if __name__ == '__main__':
     apps.run(debug=True)

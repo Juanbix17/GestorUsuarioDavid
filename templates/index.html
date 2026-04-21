@@ -40,6 +40,7 @@
       <thead class="table-blue">
          <tr>
             <td>Codigo</td>
+            <td>Documento</td>
             <td>Usuario</td>
             <td>Contraseña</td>
             <td>Rol</td>
@@ -50,11 +51,12 @@
           {% for u in user %}
             <tr>
                 <td>{{ u[0] }}</td>
+                <td>{{ u[4] }}</td>
                 <td>{{ u[1] }}</td>
                 <td>{{ u[2] }}</td>
                 <td>{{ u[3] }}</td>
                 <td>
-                    <a class="btn btn-warning">Editar</a>
+                    <a href="{{ url_for('editarusu', id=u[0]) }}" class="btn btn-warning">Editar</a>
                     <a href="{{ url_for('eliminarusu', id=u[0]) }}" class="btn btn-danger"onclick="return confirm('¿Seguro que desea eliminar ese usuario?')">Eliminar</a>
                 </tr>
         {% endfor %}
@@ -90,7 +92,7 @@
                 <td>{{ e[7] }}</td>
                 <td>{{ e[8] }}</td>
                 <td>
-                    <a class="btn btn-warning">Editar</a>
+                    <a href="{{ url_for('editaremp', id=e[0]) }}" class="btn btn-warning">Editar</a>
                     <a href="{{ url_for('eliminaremp', id=e[0]) }}" class="btn btn-danger"onclick="return confirm('¿Seguro que desea eliminar ese empleado?')">Eliminar</a>
             </tr>
           {% endfor %}
