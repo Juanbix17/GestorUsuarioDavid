@@ -40,13 +40,28 @@ def login_form():
 
         if user[3] == "administrador":
                 return redirect(url_for("inicio"))
-        else:
-                return "Bienvenido empleado"
+            
+        
+        if user[3] == "empleado":
+            return redirect(url_for("inicio_empleado"))
     else: 
         flash("Usuario y contraseña incorrecto", "danger")
         return redirect(url_for('login_form'))
     
     #validad sesion en la pagina principal
+#panel del empleado===============================================================================================
+@apps.route('/inicio_empleado')
+def inicio_empleado():
+        if 'usuario' not in session:
+            return redirect(url_for('login_form'))
+        con = conectar()
+        cursor = con.cursor()
+        # Obtener la lista de empleados
+        sql = "SELECT e.Id, e.DocumentoEmple, e.NombreEmple,e.ApellidoEmple, e.Cargo, e.SalarioB, e.HoraExtra, e.Bonificacion, d.nom_area AS Departamento FROM empleados e JOIN departamentos d  ON e.id_area = d.id_area JOIN usuarios u ON u.docuemple = e.DocumentoEmple WHERE u.usuario = %s"
+        cursor.execute(sql, (session['usuario'],))
+        empleado = cursor.fetchall()
+
+        return render_template('panelempleado.html', empleado=empleado)
 @apps.route('/inicio')
 def inicio():
          
@@ -113,6 +128,41 @@ def editaremp(id):
     cursor.close()
     con.close()
     return render_template('editaremple.html', emp=empleado)
+#editar panel de empleado=================================================================================================================
+@apps.route('/editarpaemp/<int:id>')
+def editarpaemp(id):
+    if 'usuario' not in session:
+        return redirect(url_for('login_form'))
+    con = conectar()
+    cursor = con.cursor()
+    sql = "SELECT * FROM empleados WHERE id=%s"
+    cursor.execute(sql,(id,))
+    empleado = cursor.fetchone()
+    cursor.close()
+    con.close()
+    return render_template('empleadosedi.html', emp=empleado)
+#actualizar panel de empleado=================================================================================================================
+@apps.route('/actualizarpaemp/<int:id>', methods=['POST'])
+def actualizarpaemp(id):
+    nombre = request.form['txtnombre']
+    apellido = request.form['txtapellido']
+    cargo = request.form['txtcargo']
+    departamento = request.form['txtdepartamento']
+    horas_extra = request.form['txthorasextra']
+    bonificacion = request.form['txtbonificacion']
+
+    con = conectar()
+    cursor = con.cursor()
+    
+    sql = "UPDATE empleados SET NombreEmple=%s, ApellidoEmple=%s, Cargo=%s, id_area=%s WHERE id=%s"
+    cursor.execute(sql, (nombre, apellido, cargo, departamento, id))
+    con.commit()
+    
+    cursor.close()
+    con.close()
+    
+    print("Empleado actualizado correctamente")
+    return redirect(url_for('inicio'))
 #actualizar empleado
 @apps.route('/actualizaremp/<int:id>', methods=['POST'])
 def actualizaremp(id):
@@ -198,19 +248,21 @@ def eliminarusu(id):
     cursor = con.cursor()
 
     #buscar usuario
-    sql = "SELECT rol FROM usuarios WHERE id_usuario=%s"
+    sql = "SELECT rol, docuemple FROM usuarios WHERE id_usuario=%s"
     cursor.execute(sql,(id,))
     usuario = cursor.fetchone()
     #validar el rol del usuario
     if usuario:
         rol = usuario[0]
+        documento = usuario[1]
         if rol == "administrador":
             flash("No se puede eliminar un usuario con rol de administrador")
             
         else:
-            cursor.execute("DELETE FROM usuarios WHERE id_usuario=%s",(id,))
+            cursor.execute("DELETE FROM usuarios WHERE docuemple=%s",(documento,))
+            cursor.execute("DELETE FROM empleados WHERE DocumentoEmple=%s",(documento,))
             con.commit()
-            flash("Usuario eliminado correctamente")
+            flash("Usuario eliminado correctamente")    
             
     cursor.close()
     con.close()
@@ -231,9 +283,9 @@ def eliminaremp(id):
 
     if empleado:
         documento_emple = empleado[0]
-        cargo = empleado[1]
+        rol = empleado[1]
 
-        if cargo.lower() == "administrador":
+        if rol.lower() == "administrador":
             flash("No se puede eliminar un usuario con rol de administrador")
             cursor.close()
             con.close()
