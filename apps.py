@@ -56,11 +56,13 @@ def inicio_empleado():
             return redirect(url_for('login_form'))
         con = conectar()
         cursor = con.cursor()
-        # Obtener la lista de empleados
+        # Obtener a empleado
         sql = "SELECT e.Id, e.DocumentoEmple, e.NombreEmple,e.ApellidoEmple, e.Cargo, e.SalarioB, e.HoraExtra, e.Bonificacion, d.nom_area AS Departamento FROM empleados e JOIN departamentos d  ON e.id_area = d.id_area JOIN usuarios u ON u.docuemple = e.DocumentoEmple WHERE u.usuario = %s"
         cursor.execute(sql, (session['usuario'],))
-        empleado = cursor.fetchall()
-
+        empleado = cursor.fetchone()
+        
+        cursor.close()
+        con.close()
         return render_template('panelempleado.html', empleado=empleado)
 @apps.route('/inicio')
 def inicio():
@@ -74,7 +76,7 @@ def inicio():
         lista = cursor.fetchall()
 
         # Obtener la lista de empleados
-        sql = "SELECT e.Id, e.DocumentoEmple, e.NombreEmple,e.ApellidoEmple, e.Cargo, e.SalarioB, e.HoraExtra, e.Bonificacion, d.nom_area AS Departamento FROM empleados e JOIN departamentos d  ON e.id_area = d.id_area"
+        sql = "SELECT e.Id, e.DocumentoEmple, e.NombreEmple,e.ApellidoEmple, e.Cargo, e.SalarioB, e.HoraExtra, e.Bonificacion, d.nom_area AS Departamento FROM empleados e LEFT JOIN departamentos d  ON e.id_area = d.id_area"
         cursor.execute(sql)
         empleados = cursor.fetchall()
         
@@ -140,7 +142,7 @@ def editarpaemp(id):
     empleado = cursor.fetchone()
     cursor.close()
     con.close()
-    return render_template('empleadosedi.html', emp=empleado)
+    return render_template('panelempleado.html', emp=empleado)
 #actualizar panel de empleado=================================================================================================================
 @apps.route('/actualizarpaemp/<int:id>', methods=['POST'])
 def actualizarpaemp(id):
@@ -148,8 +150,6 @@ def actualizarpaemp(id):
     apellido = request.form['txtapellido']
     cargo = request.form['txtcargo']
     departamento = request.form['txtdepartamento']
-    horas_extra = request.form['txthorasextra']
-    bonificacion = request.form['txtbonificacion']
 
     con = conectar()
     cursor = con.cursor()
@@ -162,7 +162,7 @@ def actualizarpaemp(id):
     con.close()
     
     print("Empleado actualizado correctamente")
-    return redirect(url_for('inicio'))
+    return redirect(url_for('inicio_empleado'))
 #actualizar empleado
 @apps.route('/actualizaremp/<int:id>', methods=['POST'])
 def actualizaremp(id):
